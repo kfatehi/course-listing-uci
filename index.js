@@ -31,10 +31,7 @@ scrape({
   var doTake = []
 
   // Generate a list of classes 
-  _.each(canTake, function(course) {
-    if (_.includes(needed, course.title))
-      doTake.push(course)
-  })
+  _.each(canTake, c => _.includes(needed, c.title) ? doTake.push(c) : null)
 
   // We get the list of classes to "register for"
   // but this should really be filtered with respect
