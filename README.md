@@ -7,7 +7,3 @@ Generate a list of classes I should try to register next Quarter (json output st
 ```
 node index.js 
 ```
-
-## TODO
-
-* add respect with prerequisites
