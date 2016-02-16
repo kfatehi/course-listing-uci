@@ -3,7 +3,6 @@ const Promise = require('bluebird')
 const _ = require('lodash')
 const scrape = require('scrape-uci')
 
-
 // List of ICS courses that I still need to graduate
 let needed = [
   'ICS 45J',
@@ -31,6 +30,7 @@ let needed = [
 function format(collection, find, replace) {
   return _.map(collection, c => {
     c.id = c.id.replace(find, replace)
+    delete c.prerequisite // dont care
     return c
   })
 }
@@ -80,30 +80,24 @@ function scrapeWebSOC() {
   ]).spread((inf, ics) => inf.concat(ics))
 }
 
-
-function takeFromCourseListings() {
-  return scrapeCourseListing().then(function(canTake) {
-    var doTake = []
-
-    // Generate a list of classes 
-    _.each(canTake, c => _.includes(needed, c.id) ? doTake.push(c) : null)
-
-    // We get the list of classes to "register for"
-    // but this should really be filtered with respect
-    // to their pre-requisites. We have already built
-    // everything necessary to do that too! :)
-    return doTake;
-  })
-}
-
-function takeFromWebSOC() {
-  return scrapeWebSOC().then(function(canTake) {
+function take(needed) {
+  return function(canTake) {
     var doTake = []
     _.each(canTake, c => _.includes(needed, c.id) ? doTake.push(c) : null)
     return doTake;
-  })
+  }
 }
 
-takeFromWebSOC().then(results => console.log(results))
+function takeFromCourseListings(needed) {
+  return scrapeCourseListing().then(take(needed))
+}
 
-//takeFromCourseListings().then(results => console.log(results))
+function takeFromWebSOC(needed) {
+  return scrapeWebSOC().then(take(needed))
+}
+
+// if websoc has not published next quarter, use this
+//takeFromCourseListings(needed).then(results => console.log(results))
+
+// if websoc has published next quarter, use this
+takeFromWebSOC(needed).then(results => console.log(results))
