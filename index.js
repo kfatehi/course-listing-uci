@@ -88,16 +88,8 @@ function take(needed) {
   }
 }
 
-function takeFromCourseListings(needed) {
-  return scrapeCourseListing().then(take(needed))
-}
-
-function takeFromWebSOC(needed) {
-  return scrapeWebSOC().then(take(needed))
-}
-
 // if websoc has not published next quarter, use this
-//takeFromCourseListings(needed).then(results => console.log(results))
+//scrapeWebSOC().then(take(needed)).then(results => console.log(results))
 
 // if websoc has published next quarter, use this
-takeFromWebSOC(needed).then(results => console.log(results))
+scrapeCourseListing().then(take(needed)).then(results => console.log(results))
