@@ -25,6 +25,9 @@ let needed = [
   'INF 148',
   'INF 163',
   'INF 172',
+
+  // just wanna
+  'Bio Sci 197',
 ]
 
 function format(collection, find, replace) {
@@ -52,44 +55,34 @@ function scrapeCourseListing() {
 
 // If we're close enough to the next quarter, can use websoc too
 function scrapeWebSOC() {
-  function scrapeInformatics() {
+  function scrapeDept(name, find, replace) {
     return new Promise(function(resolve, reject) {
       scrape({
-        source:'websoc', dept:'in4matx',
+        source:'websoc', dept:name,
         year:'2016', period:'spring'
       }, (err, canTake) => {
         if (err) throw err;
-        resolve(format(canTake, "In4matx", "INF "))
-      })
-    });
-  }
-  function scrapeICS() {
-    return new Promise(function(resolve, reject) {
-      scrape({
-        source:'websoc', dept:'i&c sci',
-        year:'2016', period:'spring'
-      }, (err, canTake) => {
-        if (err) throw err;
-        resolve(format(canTake, /^I/, "ICS "))
+        resolve(format(canTake, find, replace));
       })
     });
   }
   return Promise.all([
-    scrapeInformatics(),
-    scrapeICS()
-  ]).spread((inf, ics) => inf.concat(ics))
+    scrapeDept('in4matx', 'In4matx', 'INF '),
+    scrapeDept('i&c sci', /^I/, 'ICS '),
+    scrapeDept('bio sci', /^Bio/, 'Bio Sci '),
+  ]).then(depts => _.reduce(depts, (all, dept) => all = (all || []).concat(dept)))
 }
 
 function take(needed) {
   return function(canTake) {
     var doTake = []
-    _.each(canTake, c => _.includes(needed, c.id) ? doTake.push(c) : null)
+    _.each(canTake, c => c && _.includes(needed, c.id) ? doTake.push(c) : null)
     return doTake;
   }
 }
 
 // if websoc has not published next quarter, use this
-//scrapeWebSOC().then(take(needed)).then(results => console.log(results))
+scrapeWebSOC().then(take(needed)).then(results => console.log(results))
 
 // if websoc has published next quarter, use this
-scrapeCourseListing().then(take(needed)).then(results => console.log(results))
+//scrapeCourseListing().then(take(needed)).then(results => console.log(results))
