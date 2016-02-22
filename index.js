@@ -27,7 +27,7 @@ let needed = [
   'INF 172',
 
   // just wanna
-  'Bio Sci 197',
+  //'Bio Sci 197',
 ]
 
 function format(collection, find, replace) {
@@ -69,7 +69,7 @@ function scrapeWebSOC() {
   return Promise.all([
     scrapeDept('in4matx', 'In4matx', 'INF '),
     scrapeDept('i&c sci', /^I/, 'ICS '),
-    scrapeDept('bio sci', /^Bio/, 'Bio Sci '),
+    //scrapeDept('bio sci', /^Bio/, 'Bio Sci '),
   ]).then(depts => _.reduce(depts, (all, dept) => all = (all || []).concat(dept)))
 }
 
